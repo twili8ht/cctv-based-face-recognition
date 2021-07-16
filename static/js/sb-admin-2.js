@@ -99,44 +99,67 @@ $(document).ready(function() {
     }, 1000);
 });
 
-$(document).ready(function() {
-    var myList = [
-        { "Name": "0", "ID": "1", "DateTime": "2", "Location": "3", "Age": "4", "Duration": "5", "Confidence": "6"}
-    ];
-
-    // Builds the HTML Table out of myList.
-    function buildHtmlTable(selector) {
-        var columns = addAllColumnHeaders(myList, selector);
-
-        for (var i = 0; i < myList.length; i++) {
-            var row$ = $('<tr/>');
-            for (var colIndex = 0; colIndex < columns.length; colIndex++) {
-                var cellValue = myList[i][columns[colIndex]];
-                if (cellValue == null) cellValue = "";
-                row$.append($('<td/>').html(cellValue));
-            }
-            $(selector).append(row$);
-        }
+$(document).ready(function () {
+  var myList;
+  $.ajax({ // 처음 웹페이지 로딩시 표시하기 위해
+    type: 'GET',
+    dataType: 'text',
+    url: '/index/table',
+    cache: false,
+    success: function (result) {
+      myList = result;
     }
+  })
 
-    // Adds a header row to the table and returns the set of columns.
-    // Need to do union of keys from all records as some records may not contain
-    // all records.
-    function addAllColumnHeaders(myList) {
-        var columnSet = [];
-        for (var i = 0; i < myList.length; i++) {
-            var rowHash = myList[i];
-            for (var key in rowHash) {
-                if ($.inArray(key, columnSet) == -1) {
-                    columnSet.push(key);
-                }
-            }
-        }
-        return columnSet;
+  // Builds the HTML Table out of myList.
+  function buildHtmlTable(selector) {
+    $(selector).empty(); // table initiate
+    var jsonData = JSON.parse(myList) //string to JSON parsing
+    var jsonDataRows = Object.keys(jsonData)
+    var jsonDataKeys = Object.keys(jsonData[jsonDataRows[0]])
+    addAllColumnHeaders(jsonDataKeys, selector);
+
+    // console.log(jsonDataRows, jsonDataKeys)
+
+
+    for (var i = 0; i < jsonDataRows.length; i++) { // total number of json data (rows)
+      var row$ = $('<tr/>');
+      $.each(jsonData[jsonDataRows[i]], function (key, value) { // add rows 
+        // console.log('키 : ' + key + ', 값 :' + value);
+        var cellValue = value
+        if (cellValue == null) cellValue = "";
+        row$.append($('<td/>').html(cellValue));
+      });
+      $(selector).append(row$);
     }
-    setInterval(function () {
-            buildHtmlTable(document.getElementById('dataTable'));
-    }, 1000);
+  }
+
+  // Adds a header row to the table and returns the set of columns.
+  // Need to do union of keys from all records as some records may not contain
+  // all records.
+  function addAllColumnHeaders(collist, selector) {
+    var row$ = $('<thead>');
+    $.each(collist, function (index, key) {
+      var cellValue = key;
+      row$.append($('<td/>').html(cellValue));
+    })
+    row$.append($('<tr/><thead/>'));
+    $(selector).append(row$);
+  }
+  setInterval(function () {
+    $.ajax({
+      type: 'GET',
+      dataType: 'text',
+      url: '/index/table',
+      cache: false,
+      success: function (result) {
+        myList = result;
+      }
+    })
+  }, 1000);
+  setInterval(function () {
+    buildHtmlTable(document.getElementById('dataTable'));
+  }, 1000);
 });
 
 })(jQuery); // End of use strict

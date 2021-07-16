@@ -4,6 +4,8 @@ from fastapi.responses import HTMLResponse, PlainTextResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import datetime
+import redis_usr
+import redis_gen
 
 app = FastAPI()
 
@@ -27,5 +29,5 @@ async def get_time2():
 
 
 @app.get("/index/table", response_class=JSONResponse)
-async def get_time2():
-    return datetime.datetime.now().strftime("%H.%M.%S")
+async def get_data():
+    return redis_usr.redisUsr()
