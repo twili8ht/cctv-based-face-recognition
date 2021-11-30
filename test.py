@@ -8,6 +8,7 @@ import redis_usr
 import redis_gen
 
 app = FastAPI()
+redis_gen.redisGenerator()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
@@ -31,3 +32,8 @@ async def get_time2():
 @app.get("/index/table", response_class=JSONResponse)
 async def get_data():
     return redis_usr.redisUsr()
+
+@app.post("/index/video_feed", response_class=JSONResponse)
+async def get_video():
+    # return redis_usr.get_video()
+    return redis_usr.get_buf_video()

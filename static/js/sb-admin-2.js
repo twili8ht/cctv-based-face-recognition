@@ -77,6 +77,48 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
+  var frames
+
+  $.ajax({ // video 출력 
+      context: document.body,
+      type: 'POST',
+      dataType : 'json',
+      url: '/index/video_feed',
+      success: function (result) {
+        frames = result;
+      }
+  })
+  //여기부터 
+  function buildVideo(selector) {
+    // $(selector).empty(); // video initiate
+    console.log(frames) //정상 출력 확인
+    // console.log(frames['0'])
+    
+    // var imageUrl = "data:image/png;base64," + Base64.encode(frames[0][0]);
+    var imageUrl = "data:image/png;base64," + frames;
+    console.log('img: '+imageUrl);
+    if (document.getElementById("frame") == null)
+      console.log("img tag is null")
+    document.getElementById("frame").src =imageUrl;
+    $("frame").attr('src', imageUrl);
+  }
+  
+  setInterval(function () {
+    $.ajax({
+      type: 'POST',
+      dataType : 'json',
+      url: '/index/video_feed',
+      cache: false,
+      success: function (result) {
+        frames = result;
+        buildVideo(document.getElementById('streaming'));
+      }
+    })
+  }, 50);
+});
+
+
+$(document).ready(function() {
     $.ajax({ // 처음 웹페이지 로딩시 표시하기 위해
         type: 'GET',
         dataType: 'text',
@@ -98,6 +140,7 @@ $(document).ready(function() {
         })
     }, 1000);
 });
+
 
 $(document).ready(function () {
   var myList;
